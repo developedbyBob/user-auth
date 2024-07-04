@@ -1,211 +1,151 @@
-User Authentication Service
-===========================
 
-This project implements a user authentication service using Node.js, Express, and MongoDB, following the MVC (Model-View-Controller) pattern.
+# Serviço de Autenticação de Usuários
 
-Table of Contents
------------------
+Este projeto implementa um serviço de autenticação de usuários usando Node.js, Express e MongoDB, seguindo o padrão MVC (Model-View-Controller).
 
--   [Overview](#overview)
--   [Features](#features)
--   [Technologies Used](#technologies-used)
--   [Project Structure](#project-structure)
--   [Installation](#installation)
--   [Usage](#usage)
--   [Controllers](#controllers)
--   [API Documentation](#api-documentation)
--   [Environment Variables](#environment-variables)
--   [License](#license)
+## Índice
 
-Overview
---------
+- [Visão Geral](#visão-geral)
+- [Recursos](#recursos)
+- [Tecnologias Utilizadas](#tecnologias-utilizadas)
+- [Instalação](#instalação)
+- [Uso](#uso)
+- [Controladores](#controladores)
+- [Variáveis de Ambiente](#variáveis-de-ambiente)
+- [Licença](#licença)
 
-This application provides basic user authentication functionalities, including user registration and login, secured with JSON Web Tokens (JWT). The project follows the MVC pattern to organize the code efficiently and promote scalability.
+## Visão Geral
 
-Features
---------
+Esta aplicação fornece funcionalidades básicas de autenticação de usuários, incluindo registro e login de usuários, protegidos com JSON Web Tokens (JWT). O projeto segue o padrão MVC para organizar o código de forma eficiente e promover a escalabilidade.
 
--   User registration with password hashing
--   User login with JWT token generation
--   Secure password storage using bcrypt
--   Environment-based configuration
+## Recursos
 
-Technologies Used
------------------
+- Registro de usuários com hash de senha
+- Login de usuários com geração de token JWT
+- Armazenamento seguro de senhas usando bcrypt
+- Configuração baseada em ambiente
 
--   Node.js
--   Express
--   MongoDB
--   Mongoose
--   bcryptjs
--   jsonwebtoken
--   dotenv
--   swagger-jsdoc
--   swagger-ui-express
+## Tecnologias Utilizadas
 
-Project Structure
------------------
+- Node.js
+- Express
+- MongoDB
+- Mongoose
+- bcryptjs
+- jsonwebtoken
+- dotenv
 
-`user-auth/
-│
-├── controllers/
-│   └── authController.js
-├── models/
-│   └── User.js
-├── routes/
-│   └── authRoutes.js
-├── config/
-│   └── db.js
-│   └── swagger.js
-├── .env
-├── app.js
-└── server.js`
+## Instalação
 
-Installation
-------------
+1. **Clone o repositório:**
 
-1.  **Clone the repository:**
+   ```sh
+   git clone https://github.com/your-username/user-auth.git
+   cd user-auth
+   ```
 
+2. **Instale as dependências:**
 
-    `git clone https://github.com/your-username/user-auth.git
-    cd user-auth`
+   ```sh
+   npm install
+   ```
 
-2.  **Install dependencies:**
+4. **Inicie o servidor:**
 
-    `npm install`
+   ```sh
+   node server.js
+   ```
 
-3.  **Set up environment variables:**
+## Uso
 
-    Create a `.env` file in the root directory and add your MongoDB URI and JWT secret:
+### Registro
 
-    `MONGO_URI=mongodb://localhost:27017/userauth
-    JWT_SECRET=your_generated_secret`
-
-4.  **Start the server:**
-
-    `node server.js`
-
-Usage
------
-
-### Registration
-
--   **Endpoint:** `/api/auth/register`
--   **Method:** `POST`
--   **Request Body:**
-
-    json
-
-    Copiar código
-
-    `{
-      "name": "John Doe",
-      "email": "john@example.com",
-      "password": "password123"
-    }`
+- **Endpoint:** `/api/auth/register`
+- **Método:** `POST`
+- **Corpo da Requisição:**
+  ```json
+  {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123"
+  }
+  ```
 
 ### Login
 
--   **Endpoint:** `/api/auth/login`
--   **Method:** `POST`
--   **Request Body:**
+- **Endpoint:** `/api/auth/login`
+- **Método:** `POST`
+- **Corpo da Requisição:**
+  ```json
+  {
+    "email": "john@example.com",
+    "password": "password123"
+  }
+  ```
 
-    json
+## Controladores
 
-    Copiar código
-
-    `{
-      "email": "john@example.com",
-      "password": "password123"
-    }`
-
-Controllers
------------
-
-The controllers handle the core logic of the application. The main controllers used are:
+Os controladores lidam com a lógica central da aplicação. Os principais controladores utilizados são:
 
 ### authController.js
 
--   **register:** Handles user registration. It checks if the user already exists, hashes the password, saves the new user to the database, and generates a JWT token.
+- **register:** Lida com o registro de usuários. Verifica se o usuário já existe, faz o hash da senha, salva o novo usuário no banco de dados e gera um token JWT.
 
-    js
-
-    Copiar código
-
-    `exports.register = async (req, res) => {
-      const { name, email, password } = req.body;
-      try {
-        let user = await User.findOne({ email });
-        if (user) {
-          return res.status(400).json({ message: 'User already exists' });
-        }
-        user = new User({ name, email, password });
-        await user.save();
-        const payload = { user: { id: user.id } };
-        jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
-          if (err) throw err;
-          res.status(200).json({ token });
-        });
-      } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
+  ```js
+  exports.register = async (req, res) => {
+    const { name, email, password } = req.body;
+    try {
+      let user = await User.findOne({ email });
+      if (user) {
+        return res.status(400).json({ message: 'User already exists' });
       }
-    };`
+      user = new User({ name, email, password });
+      await user.save();
+      const payload = { user: { id: user.id } };
+      jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+        if (err) throw err;
+        res.status(200).json({ token });
+      });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
+    }
+  };
+  ```
 
--   **login:** Handles user login. It checks if the user exists, verifies the password, and generates a JWT token.
+- **login:** Lida com o login de usuários. Verifica se o usuário existe, verifica a senha e gera um token JWT.
 
-    js
-
-    Copiar código
-
-    `exports.login = async (req, res) => {
-      const { email, password } = req.body;
-      try {
-        let user = await User.findOne({ email });
-        if (!user) {
-          return res.status(400).json({ message: 'Invalid credentials' });
-        }
-        const isMatch = await user.matchPassword(password);
-        if (!isMatch) {
-          return res.status(400).json({ message: 'Invalid credentials' });
-        }
-        const payload = { user: { id: user.id } };
-        jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
-          if (err) throw err;
-          res.status(200).json({ token });
-        });
-      } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
+  ```js
+  exports.login = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+      let user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({ message: 'Invalid credentials' });
       }
-    };`
+      const isMatch = await user.matchPassword(password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Invalid credentials' });
+      }
+      const payload = { user: { id: user.id } };
+      jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+        if (err) throw err;
+        res.status(200).json({ token });
+      });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
+    }
+  };
+  ```
 
-API Documentation
------------------
+## Variáveis de Ambiente
 
-The API documentation is available and interactive through Swagger. After starting the server, you can access it at:
+A aplicação utiliza variáveis de ambiente para gerenciar dados sensíveis. Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 
--   **Swagger UI:** `http://localhost:5000/api-docs`
--   **Swagger JSON:** `http://localhost:5000/api-docs.json`
+- `MONGO_URI`: A string de conexão do MongoDB.
+- `JWT_SECRET`: A chave secreta usada para assinar os tokens JWT.
 
-Environment Variables
----------------------
+## Licença
 
-The application uses environment variables to manage sensitive data. Create a `.env` file in the root of the project with the following variables:
-
--   `MONGO_URI`: The MongoDB connection string.
--   `JWT_SECRET`: The secret key used to sign JWT tokens.
-
-Example `.env` file:
-
-bash
-
-Copiar código
-
-`MONGO_URI=mongodb://localhost:27017/userauth
-JWT_SECRET=your_generated_secret`
-
-License
--------
-
-This project is licensed under the MIT License. See the LICENSE file for details.
+Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
