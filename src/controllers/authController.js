@@ -19,6 +19,7 @@ exports.register = async (req, res) => {
 
         jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: '1h'}, (err, token) => {
             if(err) throw err
+            console.log(`User created: ${user.email}`)
             res.status(200).json({ token })
         })
     } catch (err) {
@@ -47,6 +48,7 @@ exports.login = async (req, res) => {
 
         jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: '1h'}, (err, token) => {
             if (err) throw err
+            console.log(`User logged in: ${user.email}`);
             res.status(200).json({token})
         })
     } catch (err) {
